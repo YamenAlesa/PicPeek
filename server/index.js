@@ -1,9 +1,24 @@
 const express = require("express");
 const path = require("path");
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4499;
 const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const userRoutes = require("./routes/userRoutes");
+const postRoutes = require("./routes/postRoutes");
+
 dotenv.config();
+
+// Database
+mongoose.connect(process.env.MONGOURI, {});
+const db = mongoose.connection;
+db.on("error", (error) => console.error(error));
+db.once("open", () => console.log("Connected"));
+
+// Cors
+app.use(cors());
+app.use(express.json());
 
 // API endpoint
 app.get("/api", (req, res) => {
@@ -20,6 +35,9 @@ app.get("*", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+app.use("/api/users", userRoutes);
+app.use("/api/post", postRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack); // Log error stack
