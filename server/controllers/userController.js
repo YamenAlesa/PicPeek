@@ -37,6 +37,17 @@ const createUser = async (req, res) => {
     const { username, name, email, password } = req.body;
     const encryptedPassword = await bcrypt.hash(password, 12);
 
+    const existingEmail = await User.findOne({ email });
+    const existingUsername = await User.findOne({ username });
+
+    if (existingEmail) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    if (existingUsername) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
     const newUser = new User({
       username,
       name,
@@ -45,19 +56,13 @@ const createUser = async (req, res) => {
     });
 
     const user = await newUser.save();
-    if (!user) {
-      return res.status(400).json({ message: "User not created" });
-    }
+
     return res.status(201).json({ message: "User created", user });
   } catch (error) {
     if (error.code === 11000) {
-      // Duplicate key error
-      if (error.keyPattern.username) {
-        return res.status(400).json({ message: "Username already exists" });
-      }
-      if (error.keyPattern.email) {
-        return res.status(400).json({ message: "Email already exists" });
-      }
+      return res
+        .status(400)
+        .json({ message: "Username or email already exists" });
     }
     console.log(error);
     return res.status(500).json({ message: error.message });
@@ -77,11 +82,18 @@ const deleteUser = async (req, res) => {
   }
 };
 
-const updateUsers = (req, res) => {
-  const user = User.find((u) => u.id == req.params.id);
+const updateUsers = async (req, res) => {
+  const user = await User.findById(req.params.id);
   if (!user) return res.status(404).json({ message: "User not found" });
+  const { username, name, email, password, profilePicture } = req.body;
 
-  user.name = req.body.name || user.name;
+  user.username = username || user.username;
+  user.name = name || user.name;
+  user.email = email || user.email;
+  user.password = password || user.password;
+  user.profilePicture = profilePicture || user.profilePicture;
+
+  await user.save();
   res.status(200).json(user);
 };
 
