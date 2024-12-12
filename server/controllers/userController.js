@@ -1,5 +1,6 @@
 const User = require("../models/userModels");
 const bcrypt = require("bcrypt");
+const mongoose = require("mongoose");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -62,6 +63,7 @@ const createUser = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
 const deleteUser = async (req, res) => {
   try {
     const userDelete = await User.findByIdAndDelete(req.params.id);

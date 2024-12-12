@@ -18,12 +18,16 @@ db.once("open", () => console.log("Connected"));
 
 // Cors
 app.use(cors());
-app.use(express.json());
+
 
 // API endpoint
 app.get("/api", (req, res) => {
   res.json({ message: "Hello from the server!" });
 });
+
+app.use("/api/users", userRoutes);
+app.use("/api/post", postRoutes);
+
 
 // All other routes serve React app
 app.get("*", (req, res) => {
@@ -36,8 +40,6 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-app.use("/api/users", userRoutes);
-app.use("/api/post", postRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack); // Log error stack
