@@ -2,6 +2,8 @@ const User = require("../models/userModels");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 
+// move some logic to authController
+
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
@@ -87,10 +89,12 @@ const updateUsers = async (req, res) => {
   if (!user) return res.status(404).json({ message: "User not found" });
   const { username, name, email, password, profilePicture } = req.body;
 
+  const encryptedPassword = await bcrypt.hash(password, 12);
+
   user.username = username || user.username;
   user.name = name || user.name;
   user.email = email || user.email;
-  user.password = password || user.password;
+  user.password = encryptedPassword || user.password;
   user.profilePicture = profilePicture || user.profilePicture;
 
   await user.save();
