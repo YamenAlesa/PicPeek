@@ -10,6 +10,7 @@ module.exports = (req, res, next) => {
     console.log("access denied");
     return res.sendStatus(401);
   }
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;

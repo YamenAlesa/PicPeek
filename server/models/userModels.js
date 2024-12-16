@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema(
       required: true,
       Minlength: 6,
     },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
     followers: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
