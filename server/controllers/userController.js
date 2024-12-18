@@ -39,7 +39,16 @@ const getUserByUsername = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    return res.status(200).json(users);
+    const userToReturn = users.map((user) => {
+      return {
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        profilePicture: user.profilePicture,
+      };
+    });
+
+    return res.status(200).json(userToReturn);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: error.message });
