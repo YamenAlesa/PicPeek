@@ -33,7 +33,7 @@ const RegisterPage = () => {
     event.preventDefault();
     setServerError("");
     setSuccessMessage("");
-  
+
     if (
       usernameError ||
       !username ||
@@ -46,7 +46,7 @@ const RegisterPage = () => {
       alert("Please fill all fields correctly");
       return;
     }
-  
+
     try {
       const response = await axios.post("http://localhost:4499/api/users", {
         username,
@@ -54,7 +54,7 @@ const RegisterPage = () => {
         email,
         password,
       });
-  
+
       if (response.status === 201) {
         setSuccessMessage("Registration successful!");
         setUsername("");
@@ -71,7 +71,6 @@ const RegisterPage = () => {
       }
     }
   };
-  
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
@@ -184,12 +183,12 @@ const RegisterPage = () => {
             Sign up
           </button>
 
-          <p className="text-center text-sm text-gray-500">
-            Already have an account?
-            <a className="underline" href="/auth/login">
+          <div className=" flex text-center justify-center text-sm text-gray-500 gap-1">
+            <p className="">Already have an account?</p>
+            <a className=" gap-2 underline" href="/auth/login">
               Sign in
             </a>
-          </p>
+          </div>
         </form>
       </div>
     </div>
