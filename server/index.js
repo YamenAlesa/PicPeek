@@ -28,6 +28,7 @@ app.get("/api", (req, res) => {
 app.use("/api/users", userRoutes);
 app.use("/api/post", postRoutes);
 
+
 // All other routes serve React app
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/build/index.html"));
