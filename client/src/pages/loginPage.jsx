@@ -90,11 +90,11 @@ const LoginPage = () => {
 
           <button
             type="submit"
-            className="block w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white hover:bg-indigo-700"
+            className="block w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white"
           >
             Sign in
           </button>
-          <div className="flex text-center justify-center gap-1 text-sm left-2 text-gray-500">
+          <div className="flex text-center justify-center gap-2 text-sm left-2 text-gray-500">
             <p className="">No account?</p>
             <a className="underline" href="/auth/register">
               Sign up
