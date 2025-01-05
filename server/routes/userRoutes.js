@@ -9,6 +9,8 @@ router.get(
   userController.getUserByUsername
 );
 
+router.get("/profile", authMiddleware, userController.getUserProfile);
+
 router.post("/", userController.createUser);
 
 router.delete("/:id", authMiddleware, userController.deleteUser);

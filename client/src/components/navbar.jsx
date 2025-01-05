@@ -1,19 +1,54 @@
-import React from "react";
-import picpeeklogo from "../imgs/PicPeekLogo.png";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import picpeeklogoWhite from "../imgs/PicPeekLogoWhite2.png";
 
 const Navbar = () => {
+  const [user, setUser] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate(); // Hook for programmatic navigation
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const config = {
+          headers: { Authorization: `Bearer ${token}` },
+        };
+
+        const response = await axios.get(
+          "http://localhost:4499/api/users/profile",
+          config
+        );
+        setUser(response.data);
+      } catch (err) {
+        console.error("Failed to fetch user profile:", err);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove the token
+    navigate("/auth/login"); // Redirect to the login page
+  };
+
   return (
-    <nav className="bg-blue-600 p-4">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <nav className="bg-blue-600 py-2">
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
         {/* Logo */}
         <div className="flex items-center">
           <img
-            className="w-24 text-white h-auto" // Resize the logo
-            src={picpeeklogo}
+            className="w-40 h-auto"
+            src={picpeeklogoWhite}
             alt="PicPeek Logo"
           />
         </div>
-
         {/* Links */}
         <div className="hidden md:flex space-x-6">
           <a href="/home" className="text-white hover:text-gray-300">
@@ -29,39 +64,49 @@ const Navbar = () => {
             Messages
           </a>
         </div>
-
         {/* User Avatar and Menu */}
-        <div className="flex items-center space-x-4">
-          <button className="bg-white p-2 rounded-full text-blue-600 hover:bg-gray-200">
-            <i className="fas fa-bell"></i>
-          </button>
-          <button className="bg-white p-2 rounded-full text-blue-600 hover:bg-gray-200">
-            <i className="fas fa-comment-alt"></i>
-          </button>
-
-          {/* Profile icon */}
-          <div className="relative">
-            <button className="w-10 h-10 rounded-full bg-gray-300 text-white">
+        <div className="relative">
+          {user ? (
+            <button
+              onClick={toggleMenu}
+              className="w-10 h-10 hover:scale-125 rounded-full overflow-hidden border-2 border-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              <img
+                src={user.profilePicture || "https://via.placeholder.com/150"}
+                alt="User Profile"
+                className=" w-full h-full object-cover"
+              />
+            </button>
+          ) : (
+            <button className="w-10 h-10 rounded-full bg-gray-300 text-white flex items-center justify-center">
               <i className="fas fa-user"></i>
             </button>
-            <div className="absolute right-0 top-12 bg-white shadow-md rounded-md p-2 w-40">
-              <ul className="space-y-2 text-gray-700">
+          )}
+
+          {isMenuOpen && (
+            <div className="absolute right-0 mt-2 bg-white shadow-md rounded-md w-40">
+              <ul className="py-2 text-gray-700">
                 <li>
-                  <a href="/user/profile" className="hover:text-blue-600">
+                  <a
+                    href="/user/profile"
+                    className="block px-4 py-2 hover:bg-gray-100 hover:text-blue-600"
+                  >
                     Profile
                   </a>
                 </li>
                 <li>
-                  <a href="/auth/login" className="hover:text-blue-600">
+                  <button
+                    onClick={handleLogout}
+                    className="block px-4 py-2 w-full text-left hover:bg-gray-100 hover:text-blue-600"
+                  >
                     Logout
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>
-          </div>
+          )}
         </div>
       </div>
-
       {/* Mobile Menu (Hamburger) */}
       <div className="md:hidden flex items-center justify-between">
         <button className="text-white">
