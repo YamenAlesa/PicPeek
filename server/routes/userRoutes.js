@@ -11,6 +11,8 @@ router.get(
 
 router.get("/profile", authMiddleware, userController.getUserProfile);
 
+
+
 router.post("/", userController.createUser);
 
 router.delete("/:id", authMiddleware, userController.deleteUser);

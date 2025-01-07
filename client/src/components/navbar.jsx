@@ -34,8 +34,8 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Remove the token
-    navigate("/auth/login"); // Redirect to the login page
+    localStorage.removeItem("token"); 
+    navigate("/auth/login"); 
   };
 
   return (
@@ -54,7 +54,7 @@ const Navbar = () => {
           <a href="/home" className="text-white hover:text-gray-300">
             Home
           </a>
-          <a href="#" className="text-white hover:text-gray-300">
+          <a href="/search" className="text-white hover:text-gray-300">
             Explore
           </a>
           <a href="#" className="text-white hover:text-gray-300">
