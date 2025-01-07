@@ -21,8 +21,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 const corsOptions = {
-  origin: "http://localhost:3000", // Allow requests from frontend
-  credentials: true, // Allow cookies and credentials
+  origin: "http://localhost:3000", 
+  credentials: true, 
 };
 
 app.use(cors(corsOptions));
