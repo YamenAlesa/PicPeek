@@ -4,9 +4,9 @@ const Footer = () => {
   return (
     <footer className="bg-blue-600 text-white py-8">
       <div className="max-w-7xl mx-auto px-6">
-        {/* Footer Top Section */}
+
         <div className="grid md:grid-cols-4 gap-8">
-          {/* Company Info */}
+
           <div>
             <h3 className="text-xl font-semibold mb-4">SocialMedia</h3>
             <p className="text-gray-300">
@@ -14,7 +14,7 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Quick Links */}
+
           <div>
             <h3 className="text-xl font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2 text-gray-300">
@@ -25,7 +25,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact Info */}
+
           <div>
             <h3 className="text-xl font-semibold mb-4">Contact</h3>
             <ul className="space-y-2 text-gray-300">
@@ -34,7 +34,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Social Media */}
+
           <div>
             <h3 className="text-xl font-semibold mb-4">Follow Us</h3>
             <div className="flex space-x-4">
@@ -54,7 +54,7 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Footer Bottom Section */}
+
         <div className="mt-8 border-t border-gray-700 pt-6 text-center text-gray-300">
           <p>&copy; {new Date().getFullYear()} SocialMedia. All rights reserved.</p>
         </div>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom"; 
 import axios from "axios";
 
 const LoginPage = () => {
@@ -7,7 +7,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,17 +22,17 @@ const LoginPage = () => {
       );
 
       if (response.data.token) {
-        // Store the token in localStorage or a secure location
+
         localStorage.setItem("token", response.data.token);
         setSuccessMessage("Login successful!");
-        setErrorMessage(""); // Clear any previous errors
 
-        // Redirect to profile page
+
+
         navigate("/user/profile");
       }
     } catch (error) {
       setErrorMessage("Invalid email or password.");
-      setSuccessMessage(""); // Clear any success messages
+      setSuccessMessage(""); 
     }
   };
 

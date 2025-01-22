@@ -7,6 +7,22 @@ const UserDetailPage = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
 
+  const followUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.post(
+        "http://localhost:4499/api/users/follow",
+        { targetUserId: user.id },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -19,7 +35,7 @@ const UserDetailPage = () => {
           `http://localhost:4499/api/users/search/${username}`,
           config
         );
-        setUser(response.data[0]); // Assuming the search route returns an array
+        setUser(response.data[0]);
       } catch (err) {
         setError("Failed to load user details.");
       }
@@ -47,10 +63,11 @@ const UserDetailPage = () => {
         </div>
       </div>
       <div className="mt-4">
-        <p>Posts: {user.posts}</p>
+        <p>Posts: {user.postCount}</p>
         <p>Followers: {user.followers}</p>
         <p>Following: {user.following}</p>
       </div>
+      <button onClick={() => followUser(user.id)}>Follow</button>
     </div>
   );
 };

@@ -6,7 +6,7 @@ import picpeeklogoWhite from "../imgs/PicPeekLogoWhite2.png";
 const Navbar = () => {
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate(); // Hook for programmatic navigation
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -41,7 +41,7 @@ const Navbar = () => {
   return (
     <nav className="bg-blue-600 py-2">
       <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
-        {/* Logo */}
+
         <div className="flex items-center">
           <img
             className="w-40 h-auto"
@@ -49,7 +49,7 @@ const Navbar = () => {
             alt="PicPeek Logo"
           />
         </div>
-        {/* Links */}
+
         <div className="hidden md:flex space-x-6">
           <a href="/home" className="text-white hover:text-gray-300">
             Home
@@ -64,7 +64,7 @@ const Navbar = () => {
             Messages
           </a>
         </div>
-        {/* User Avatar and Menu */}
+
         <div className="relative">
           {user ? (
             <button
@@ -107,7 +107,7 @@ const Navbar = () => {
           )}
         </div>
       </div>
-      {/* Mobile Menu (Hamburger) */}
+
       <div className="md:hidden flex items-center justify-between">
         <button className="text-white">
           <i className="fas fa-bars"></i>
