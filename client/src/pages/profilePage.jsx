@@ -1,28 +1,9 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 
 const UserProfile = () => {
-  const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
-  console.log(user);
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const config = {
-          headers: { Authorization: `Bearer ${token}` },
-        };
-
-        const response = await axios.get("http://localhost:4499/api/users/profile", config);
-        setUser(response.data);
-      } catch (err) {
-        setError("Failed to fetch user profile. Please try again.");
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
+  const user = useSelector((state) => state.user.user);
 
   if (error) return <p className="text-red-500 text-center mt-4">{error}</p>;
 
