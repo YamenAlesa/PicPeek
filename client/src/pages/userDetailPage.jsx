@@ -1,12 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { followUser } from "../requests/axios.requests";
+import { followUser, unfollowUser } from "../requests/axios.requests";
+import { useSelector } from "react-redux";
 
 const UserDetailPage = () => {
   const { username } = useParams();
-  const [user, setUser] = useState(null);
+  const [targetUser, setTagetUser] = useState(null);
+  console.log("target", targetUser);
   const [error, setError] = useState(null);
+
+  const user = useSelector((state) => state.user.user);
+  console.log("user", user);
+  const isFollowingUser = user.following.includes(targetUser?.id);
+  console.log("isFollowingUser", isFollowingUser);
+  const [isFollowing, setIsFollowing] = useState(isFollowingUser);
+
+  const handleFollowUser = async () => {
+    if (!isFollowing) {
+      setIsFollowing(true);
+      await followUser(targetUser);
+    } else {
+      setIsFollowing(false);
+      // await unfollowUser(targetUser);
+      console.log("unfollow", targetUser);
+    }
+  };
+
+  useEffect(() => {
+    setIsFollowing(isFollowingUser);
+  }, [isFollowingUser]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -20,7 +43,7 @@ const UserDetailPage = () => {
           `http://localhost:4499/api/users/search/${username}`,
           config
         );
-        setUser(response.data[0]);
+        setTagetUser(response.data[0]);
       } catch (err) {
         setError("Failed to load user details.");
       }
@@ -31,29 +54,29 @@ const UserDetailPage = () => {
 
   if (error) return <p className="text-red-500 text-center mt-4">{error}</p>;
 
-  if (!user) return <p className="text-center mt-4">Loading...</p>;
+  if (!targetUser) return <p className="text-center mt-4">Loading...</p>;
 
   return (
     <div className="max-w-screen-md mx-auto p-4">
       <div className="flex items-center gap-4 mb-4">
         <img
-          src={user.profilePicture}
-          alt={`${user.name}'s profile`}
+          src={targetUser.profilePicture}
+          alt={`${targetUser.name}'s profile`}
           className="w-24 h-24 rounded-full object-cover border border-gray-300"
         />
         <div>
-          <h2 className="text-lg font-semibold">{user.name}</h2>
-          <p className="text-gray-600">@{user.username}</p>
-          <p>{user.bio}</p>
+          <h2 className="text-lg font-semibold">{targetUser.name}</h2>
+          <p className="text-gray-600">@{targetUser.username}</p>
+          <p>{targetUser.bio}</p>
         </div>
       </div>
       <div className="mt-4">
-        <p>Posts: {user.postCount}</p>
-        <p>Followers: {user.followers}</p>
-        <p>Following: {user.following}</p>
+        <p>Posts: {targetUser.postCount}</p>
+        <p>Followers: {targetUser.followers}</p>
+        <p>Following: {targetUser.following}</p>
       </div>
-      <button onClick={() => followUser(user)} className="bg-gray-600 text-white">
-        Follow
+      <button onClick={handleFollowUser} className="bg-gray-600 text-white">
+        {isFollowing ? "Unfollow" : "Follow"}
       </button>
     </div>
   );

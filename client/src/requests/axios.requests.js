@@ -15,3 +15,7 @@ export const followUser = async (user) => {
     console.error(error);
   }
 };
+
+export const unfollowUser = async (user) => {
+  console.log("unfollowUser", user);
+};
