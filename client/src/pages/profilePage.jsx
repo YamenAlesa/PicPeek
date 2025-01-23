@@ -52,13 +52,13 @@ const UserProfile = () => {
           </div>
           <div className="flex gap-6 mt-4 text-sm md:text-base">
             <p>
-              <span className="font-semibold">{user.posts}</span> posts
+              <span className="font-semibold">{user.postCount}</span> posts
             </p>
             <p>
-              <span className="font-semibold">{user.followers}</span> followers
+              <span className="font-semibold">{user.followers.length}</span> followers
             </p>
             <p>
-              <span className="font-semibold">{user.following}</span> following
+              <span className="font-semibold">{user.following.length}</span> following
             </p>
           </div>
         </div>

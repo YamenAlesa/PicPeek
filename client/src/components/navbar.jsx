@@ -6,7 +6,7 @@ import picpeeklogoWhite from "../imgs/PicPeekLogoWhite2.png";
 const Navbar = () => {
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -16,10 +16,7 @@ const Navbar = () => {
           headers: { Authorization: `Bearer ${token}` },
         };
 
-        const response = await axios.get(
-          "http://localhost:4499/api/users/profile",
-          config
-        );
+        const response = await axios.get("http://localhost:4499/api/users/profile", config);
         setUser(response.data);
       } catch (err) {
         console.error("Failed to fetch user profile:", err);
@@ -34,20 +31,15 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); 
-    navigate("/auth/login"); 
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (
     <nav className="bg-blue-600 py-2">
       <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
-
         <div className="flex items-center">
-          <img
-            className="w-40 h-auto"
-            src={picpeeklogoWhite}
-            alt="PicPeek Logo"
-          />
+          <img className="w-40 h-auto" src={picpeeklogoWhite} alt="PicPeek Logo" />
         </div>
 
         <div className="hidden md:flex space-x-6">

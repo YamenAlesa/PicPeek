@@ -1,27 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { followUser } from "../requests/axios.requests";
 
 const UserDetailPage = () => {
   const { username } = useParams();
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
-
-  const followUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      await axios.post(
-        "http://localhost:4499/api/users/follow",
-        { targetUserId: user.id },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -67,7 +52,9 @@ const UserDetailPage = () => {
         <p>Followers: {user.followers}</p>
         <p>Following: {user.following}</p>
       </div>
-      <button onClick={() => followUser(user.id)}>Follow</button>
+      <button onClick={() => followUser(user)} className="bg-gray-600 text-white">
+        Follow
+      </button>
     </div>
   );
 };

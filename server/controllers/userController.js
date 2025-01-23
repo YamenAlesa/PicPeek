@@ -123,7 +123,11 @@ const updateUsers = async (req, res) => {
 
 const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user.id)
+      .populate("following")
+      .populate("followers")
+      .select("-password")
+      .exec();
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -137,9 +141,6 @@ const getUserProfile = async (req, res) => {
 const followUser = async (req, res) => {
   const { id: userId } = req.user;
   const { targetUserId } = req.body;
-
-  console.log("req.body", req.body);
-  console.log("ids", userId, targetUserId);
 
   if (userId === targetUserId) {
     return res.status(400).json({ message: "You cannot follow yourself." });
