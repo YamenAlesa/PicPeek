@@ -2,8 +2,8 @@ import HomePage from "./homePage";
 import LoginPage from "./loginPage";
 import ProfilePage from "./profilePage";
 import RegisterPage from "./RegisterPage";
-import SearchPage from "./searchPage"; // Import the new SearchPage
-import UserDetailPage from "./userDetailPage"; // Import the new UserDetailPage
+import SearchPage from "./searchPage"; 
+import UserDetailPage from "./userDetailPage"; 
 
 export const routes = [
   {
@@ -14,7 +14,7 @@ export const routes = [
   {
     name: "LoginPage",
     element: <LoginPage />,
-    path: "/auth/login",
+    path: "/login",
   },
   {
     name: "RegisterPage",
@@ -27,13 +27,13 @@ export const routes = [
     path: "/user/profile",
   },
   {
-    name: "SearchPage", // New route for SearchPage
+    name: "SearchPage", 
     element: <SearchPage />,
     path: "/search",
   },
   {
-    name: "UserDetailPage", // New route for UserDetailPage
+    name: "UserDetailPage", 
     element: <UserDetailPage />,
-    path: "/user/profile/:username", // Dynamic route for user profiles
+    path: "/user/profile/:username", 
   },
 ];

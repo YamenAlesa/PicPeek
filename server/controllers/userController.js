@@ -1,6 +1,5 @@
 const User = require("../models/userModels");
 const bcrypt = require("bcrypt");
-const mongoose = require("mongoose");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -8,9 +7,7 @@ const getAllUsers = async (req, res) => {
     const { isAdmin } = adminUser;
 
     if (!isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "You are not authorized to view this page" });
+      return res.status(403).json({ message: "You are not authorized to view this page" });
     }
 
     const users = await User.find();
@@ -42,6 +39,10 @@ const getUserByUsername = async (req, res) => {
         name: user.name,
         email: user.email,
         profilePicture: user.profilePicture,
+        id: user._id,
+        followers: user.followers.length,
+        following: user.following.length,
+        postCount: user.postCount,
       };
     });
 
@@ -81,9 +82,7 @@ const createUser = async (req, res) => {
     return res.status(201).json({ message: "User created", user });
   } catch (error) {
     if (error.code === 11000) {
-      return res
-        .status(400)
-        .json({ message: "Username or email already exists" });
+      return res.status(400).json({ message: "Username or email already exists" });
     }
     console.log(error);
     return res.status(500).json({ message: error.message });
@@ -124,7 +123,11 @@ const updateUsers = async (req, res) => {
 
 const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user.id)
+      .populate("following")
+      .populate("followers")
+      .select("-password")
+      .exec();
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -135,8 +138,83 @@ const getUserProfile = async (req, res) => {
   }
 };
 
+const followUser = async (req, res) => {
+  const { id: userId } = req.user;
+  const { targetUserId } = req.body;
 
+  if (userId === targetUserId) {
+    return res.status(400).json({ message: "You cannot follow yourself." });
+  }
 
+  try {
+    const user = await User.findById(userId);
+    const targetUser = await User.findById(targetUserId);
+
+    if (!targetUser) {
+      return res.status(404).json({ message: "User to follow not found." });
+    }
+
+    if (user.following.includes(targetUserId)) {
+      return res.status(400).json({ message: "You already follow this user." });
+    }
+
+    user.following.push(targetUserId);
+    targetUser.followers.push(userId);
+
+    await user.save();
+    await targetUser.save();
+
+    res.status(200).json({ message: "User followed successfully." });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const unfollowUser = async (req, res) => {
+  const { id: userId } = req.user;
+
+  const { targetUserId } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    const targetUser = await User.findById(targetUserId);
+
+    if (!targetUser) {
+      return res.status(404).json({ message: "User to unfollow not found." });
+    }
+
+    if (!user.following.includes(targetUserId)) {
+      return res.status(400).json({ message: "You do not follow this user." });
+    }
+
+    user.following = user.following.filter((id) => id.toString() !== targetUserId.toString());
+    targetUser.followers = targetUser.followers.filter((id) => id.toString() !== userId.toString());
+
+    await user.save();
+    await targetUser.save();
+
+    res.status(200).json({ message: "User unfollowed successfully." });
+  } catch (error) {
+    console.error("Unfollow Error:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+const getFriends = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    const user = await User.findById(userId).populate("followers following");
+
+    const friends = user.followers.filter((follower) =>
+      user.following.includes(follower._id.toString())
+    );
+
+    res.status(200).json({ friends });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   getAllUsers,
@@ -145,4 +223,7 @@ module.exports = {
   deleteUser,
   updateUsers,
   getUserProfile,
+  followUser,
+  unfollowUser,
+  getFriends,
 };
