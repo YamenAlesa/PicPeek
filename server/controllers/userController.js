@@ -171,7 +171,8 @@ const followUser = async (req, res) => {
 };
 
 const unfollowUser = async (req, res) => {
-  const { userId } = req.user;
+  const { id: userId } = req.user;
+
   const { targetUserId } = req.body;
 
   try {
@@ -186,15 +187,16 @@ const unfollowUser = async (req, res) => {
       return res.status(400).json({ message: "You do not follow this user." });
     }
 
-    user.following = user.following.filter((id) => id.toString() !== targetUserId);
-    targetUser.followers = targetUser.followers.filter((id) => id.toString() !== userId);
+    user.following = user.following.filter((id) => id.toString() !== targetUserId.toString());
+    targetUser.followers = targetUser.followers.filter((id) => id.toString() !== userId.toString());
 
     await user.save();
     await targetUser.save();
 
     res.status(200).json({ message: "User unfollowed successfully." });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Unfollow Error:", error);
+    res.status(500).json({ message: "Internal server error." });
   }
 };
 
