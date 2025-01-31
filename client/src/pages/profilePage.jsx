@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
+import { login } from "../reducers/userReducer";
 
 const UserProfile = () => {
   const user = useSelector((state) => state.user.user);
@@ -9,12 +10,13 @@ const UserProfile = () => {
   const [name, setName] = useState(user?.name || "");
   const [bio, setBio] = useState(user?.bio || "");
   const [profilePicture, setProfilePicture] = useState(user?.profilePicture || "");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     if (user) {
-      setName(user.name || "");
-      setBio(user.bio || "");
-      setProfilePicture(user.profilePicture || "");
+      setName(user.name);
+      setBio(user.bio);
+      setProfilePicture(user.profilePicture);
     }
   }, [user]);
 
@@ -27,10 +29,12 @@ const UserProfile = () => {
       const formData = new FormData();
       formData.append("profilePicture", file);
       try {
-        const response = await axios.post("/api/users/uploadProfilePicture", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
+        const response = await axios.post("http://localhost:4499/api/cloudinary/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
         });
-        setProfilePicture(response.data.profilePicture);
+        console.log("RESPONSE", response.data);
+        setProfilePicture(response.data.user.profilePicture);
+        dispatch(login(response.data.user));
       } catch (error) {
         console.error("Error uploading profile picture", error);
       }

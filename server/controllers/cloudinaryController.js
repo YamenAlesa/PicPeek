@@ -1,6 +1,7 @@
 const cloudinary = require("cloudinary").v2;
 const uploadHandler = require("../utils/uploadHandler");
 const removeTemp = require("../utils/removeTemp");
+const User = require("../models/userModels");
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "dehiogkvb",
@@ -14,6 +15,7 @@ const cloudinaryUpload = async (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).json({ message: "No files were uploaded." });
     }
+    const user = await User.findById(req.user.id);
 
     let files = Object.values(req.files).flat();
     let images = [];
@@ -24,7 +26,16 @@ const cloudinaryUpload = async (req, res) => {
       removeTemp(file.tempFilePath);
     }
 
-    res.status(200).json({ message: "Images uploaded successfully", images });
+    // updadte user profile image
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      {
+        profilePicture: images[0],
+      },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "Images uploaded successfully", images, user: updatedUser });
   } catch (error) {
     console.error("Upload error:", error);
     res.status(500).json({ message: "Internal server error - cloudinaryUpload" });
