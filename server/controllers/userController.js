@@ -1,6 +1,22 @@
 const User = require("../models/userModels");
 const bcrypt = require("bcrypt");
 
+const checkUsernameAvailability = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const user = await User.findOne({ username });
+
+    if (user) {
+      return res.json({ exists: true });
+    } else {
+      return res.json({ exists: false });
+    }
+  } catch (error) {
+    console.error("Error checking username:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const getAllUsers = async (req, res) => {
   try {
     const adminUser = await User.findById(req.user.id);
@@ -61,12 +77,12 @@ const createUser = async (req, res) => {
     const existingEmail = await User.findOne({ email });
     const existingUsername = await User.findOne({ username });
 
-    if (existingEmail) {
-      return res.status(400).json({ message: "Email already exists" });
-    }
-
     if (existingUsername) {
       return res.status(400).json({ message: "Username already exists" });
+    }
+
+    if (existingEmail) {
+      return res.status(400).json({ message: "Email already exists" });
     }
 
     const newUser = new User({
@@ -103,19 +119,13 @@ const deleteUser = async (req, res) => {
 };
 
 const updateUsers = async (req, res) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.user.id);
   if (!user) return res.status(404).json({ message: "User not found" });
-  const { username, name, email, password, profilePicture, isAdmin } = req.body;
+  const { username, name, bio } = req.body;
 
   user.username = username || user.username;
   user.name = name || user.name;
-  user.email = email || user.email;
-  if (password) {
-    const encryptedPassword = await bcrypt.hash(password, 12);
-    user.password = encryptedPassword;
-  }
-  user.profilePicture = profilePicture || user.profilePicture;
-  user.isAdmin = isAdmin || user.isAdmin;
+  user.bio = bio || user.bio;
 
   await user.save();
   res.status(200).json(user);
@@ -226,4 +236,5 @@ module.exports = {
   followUser,
   unfollowUser,
   getFriends,
+  checkUsernameAvailability,
 };
