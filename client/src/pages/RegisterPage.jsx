@@ -21,9 +21,7 @@ const RegisterPage = () => {
     setUsername(input);
 
     if (!validateUsername(input)) {
-      setUsernameError(
-        "Username can only contain lowercase letters, numbers, and symbols (.-_)"
-      );
+      setUsernameError("Username can only contain lowercase letters, numbers, and symbols (.-_)");
     } else {
       setUsernameError("");
     }
@@ -88,9 +86,7 @@ const RegisterPage = () => {
           <p className="text-center text-lg font-medium">Create your account</p>
 
           {serverError && <p className="text-red-500 text-sm">{serverError}</p>}
-          {successMessage && (
-            <p className="text-green-500 text-sm">{successMessage}</p>
-          )}
+          {successMessage && <p className="text-green-500 text-sm">{successMessage}</p>}
 
           <div className="flex gap-1">
             <div>
@@ -122,9 +118,7 @@ const RegisterPage = () => {
                   placeholder="Enter username"
                 />
               </div>
-              {usernameError && (
-                <p className="text-red-500 text-sm mt-1">{usernameError}</p>
-              )}
+              {usernameError && <p className="text-red-500 text-sm mt-1">{usernameError}</p>}
             </div>
           </div>
 
@@ -185,7 +179,7 @@ const RegisterPage = () => {
 
           <div className=" flex text-center justify-center text-sm text-gray-500 gap-1">
             <p className="">Already have an account?</p>
-            <a className=" gap-2 underline" href="/auth/login">
+            <a className=" gap-2 underline" href="/login">
               Sign in
             </a>
           </div>
