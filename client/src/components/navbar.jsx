@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router";
 import picpeeklogoWhite from "../imgs/PicPeekLogoWhite2.png";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../reducers/userReducer";
+import { TbLogout2 } from "react-icons/tb";
+import { CgProfile } from "react-icons/cg";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,9 +26,9 @@ const Navbar = () => {
   return (
     <nav className="bg-blue-600 py-2">
       <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
-        <div className="flex items-center">
-          <img className="w-40 h-auto" src={picpeeklogoWhite} alt="PicPeek Logo" />
-        </div>
+        <Link to="/home">
+          <img className="w-40 h-auto cursor-pointer" src={picpeeklogoWhite} alt="PicPeek Logo" />
+        </Link>
 
         {user && (
           <div className="hidden md:flex space-x-6">
@@ -66,16 +68,19 @@ const Navbar = () => {
                   <Link
                     onClick={toggleMenu}
                     to="/user/profile"
-                    className="block px-4 py-2 hover:bg-gray-100 hover:text-blue-600"
+                    className="flex justify-center items-center gap-2 px-4 text-lg py-2 hover:bg-gray-100 hover:text-blue-600"
                   >
+                    <CgProfile />
                     Profile
                   </Link>
                 </li>
+
                 <li>
                   <button
                     onClick={handleLogout}
-                    className="block px-4 py-2 w-full text-left hover:bg-gray-100 hover:text-blue-600"
+                    className="flex justify-center items-center gap-2 text-lg px-4 py-2 w-full text-left hover:bg-gray-100 hover:text-blue-600"
                   >
+                    <TbLogout2 />
                     Logout
                   </button>
                 </li>
