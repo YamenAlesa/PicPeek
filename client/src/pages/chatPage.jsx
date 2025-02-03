@@ -1,54 +1,76 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom"; // Get userId from URL
-import { useSelector } from "react-redux"; // Use Redux store
+import { useSearchParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import socket from "../utils/socket";
 import API from "../utils/api";
+import axios from "axios";
 
 const Chat = () => {
-  const user = useSelector((state) => state.user.user); // Get current user
+  const user = useSelector((state) => state.user.user);
   const [searchParams] = useSearchParams();
-  const receiver = searchParams.get("userId"); // Get userId from URL
+  const receiver = searchParams.get("userId");
+
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [receiverProfile, setReceiverProfile] = useState(null);
 
   useEffect(() => {
-    if (!user) return; // Prevent running if no user
+    if (!user || !receiver) return;
 
     socket.connect();
     socket.emit("join", user._id);
 
     socket.on("receiveMessage", (data) => {
-      setMessages((prev) => [...prev, data]);
+      setMessages((prev) => [...prev, { ...data, timestamp: data.timestamp || new Date() }]);
     });
 
     return () => {
       socket.off("receiveMessage");
       socket.disconnect();
     };
-  }, [user]);
+  }, [user, receiver]);
+
+  useEffect(() => {
+    const fetchReceiverProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+
+        const response = await axios.get(`http://localhost:4499/api/users/${receiver}`, config);
+
+        console.log("Receiver Profile:", response.data); // Debugging
+
+        // If profilePicture is missing, set a default one
+        setReceiverProfile({
+          ...response.data,
+          profilePicture: response.data.profilePicture || "/default-profile.png",
+        });
+      } catch (err) {
+        console.error("Failed to load receiver's profile:", err);
+      }
+    };
+
+    if (receiver) {
+      fetchReceiverProfile();
+    }
+  }, [receiver]);
 
   const sendMessage = async () => {
-    const newMessage = { sender: user._id, receiver, message };
+    const newMessage = { sender: user._id, receiver, message, timestamp: new Date() };
 
-    // Emit the message to the server
     socket.emit("sendMessage", newMessage);
 
-    // Update the local state to display the sent message immediately
     setMessages((prevMessages) => [...prevMessages, newMessage]);
 
-    // Send the message to the server (to store it in the database)
     await API.post("/chat/send", newMessage);
 
-    // Clear the input field
     setMessage("");
   };
 
-  // Helper function to format the time
   const formatTimestamp = (timestamp) => {
+    if (!timestamp) return "";
     const date = new Date(timestamp);
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    return `${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   if (!user) return <p className="text-center mt-4">Please log in to use chat.</p>;
@@ -56,20 +78,34 @@ const Chat = () => {
   return (
     <div className="p-4">
       <h2 className="text-xl mb-2">Chat</h2>
-      {receiver ? <p>Chatting with User ID: {receiver}</p> : <p>Select a user to chat with.</p>}
+      {receiver ? (
+        <p>Chatting with {receiverProfile?.name || "User"}</p>
+      ) : (
+        <p>Select a user to chat with.</p>
+      )}
       <div className="h-60 overflow-y-auto border p-2 mt-2 space-y-2">
         {messages.map((msg, i) => (
           <div
             key={i}
             className={`flex ${msg.sender === user._id ? "justify-end" : "justify-start"}`}
           >
-            {/* Display sender name above the message */}
-            <div className="flex flex-col items-start">
+            {msg.sender !== user._id && receiverProfile?.profilePicture && (
+              <img
+                src={
+                  receiverProfile.profilePicture.startsWith("http")
+                    ? receiverProfile.profilePicture
+                    : `http://localhost:4499/${receiverProfile.profilePicture}`
+                }
+                alt="Profile"
+                className="w-8 h-8 rounded-full object-cover mr-2"
+                onError={(e) => (e.target.src = "/default-profile.png")} // Fallback image
+              />
+            )}
+            <div className="flex flex-col">
               {msg.sender !== user._id && (
-                <span className="text-sm text-gray-500">{msg.senderName}</span>
+                <span className="text-sm text-gray-500">{receiverProfile?.name}</span>
               )}
               <div className="bg-blue-500 text-white p-2 rounded-lg max-w-xs">{msg.message}</div>
-              {/* Display the timestamp below the message */}
               <span className="text-xs text-gray-400">{formatTimestamp(msg.timestamp)}</span>
             </div>
           </div>

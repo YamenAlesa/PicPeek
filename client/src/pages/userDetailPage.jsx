@@ -7,7 +7,7 @@ import { followUserRedux, unfollowUserRedux } from "../reducers/userReducer";
 
 const UserDetailPage = () => {
   const { username } = useParams();
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
   const [targetUser, setTargetUser] = useState(null);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
@@ -84,7 +84,6 @@ const UserDetailPage = () => {
         <p>Following: {targetUser.following}</p>
       </div>
 
-      {/* Follow/Unfollow Button */}
       <button
         onClick={handleFollowUser}
         className={`px-4 py-2 mt-4 text-white rounded-md ${
@@ -94,9 +93,8 @@ const UserDetailPage = () => {
         {isFollowing ? "Unfollow" : "Follow"}
       </button>
 
-      {/* Message Button */}
       <button
-        onClick={() => navigate(`/chat?userId=${targetUser.id}`)} // Navigate to chat page
+        onClick={() => navigate(`/chat?userId=${targetUser.id}`)} 
         className="px-4 py-2 mt-4 ml-2 text-white bg-green-500 rounded-md"
       >
         Message

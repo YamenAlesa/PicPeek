@@ -41,7 +41,7 @@ const Navbar = () => {
             <Link to="#" className="text-white hover:text-gray-300">
               Notifications
             </Link>
-            <Link to="/chat" className="text-white hover:text-gray-300">
+            <Link to="/messages" className="text-white hover:text-gray-300">
               Messages
             </Link>
           </div>

@@ -3,25 +3,24 @@ const User = require("../models/userModels");
 
 exports.sendMessage = async (req, res) => {
   try {
-    const { sender, receiver, message } = req.body;
+    const { receiver, message } = req.body;
 
     // Ensure that sender and receiver are valid
-    if (!sender || !receiver || !message) {
-      return res.status(400).json({ error: "Sender, receiver, and message are required." });
+    if (receiver || !message) {
+      return res.status(400).json({ error: "receiver, and message are required." });
     }
 
     // Fetch sender details
-    const senderUser = await User.findById(sender);
+    const senderUser = await User.findById(req.user.id);
     if (!senderUser) {
       return res.status(404).json({ error: "Sender not found" });
     }
 
     // Create a new message document
     const newMessage = new Message({
-      sender,
+      sender: req.user.id,
       receiver,
       message,
-      senderName: senderUser.name, // Include sender's name
     });
 
     // Save the new message to the database

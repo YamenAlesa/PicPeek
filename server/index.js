@@ -42,6 +42,8 @@ app.get("/api", (req, res) => {
   res.json({ message: "Hello from the server!" });
 });
 
+
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -49,47 +51,46 @@ app.use("/api/posts", postRoutes);
 app.use("/api/cloudinary", cloudinaryRoutes);
 app.use("/api/chat", chatRoutes);
 
-// Global Error Handler
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send("Something went wrong!");
 });
 
-//    Real-time Chat Logic
 
-let users = {}; // Change from array to object
+
+let users = {};
 
 io.on("connection", (socket) => {
   console.log("User connected", socket.id);
 
   socket.on("join", (userId) => {
-    users[userId] = socket.id; // Store user's socket ID
+    users[userId] = socket.id; 
   });
 
   socket.on("sendMessage", async ({ sender, receiver, message }) => {
     try {
-      // Emit message to receiver only if the receiver is connected
       if (users[receiver]) {
         io.to(users[receiver]).emit("receiveMessage", { sender, message });
       }
 
-      // Optionally save the message to the database (you may want to separate this logic)
-      await API.post("/chat/send", { sender, receiver, message }); // Ensure this API request works
+
+      await API.post("/chat/send", { sender, receiver, message }); 
     } catch (error) {
-      console.error("Error sending message:", error); // Log any errors
+      console.error("Error sending message:", error);
     }
   });
 
   socket.on("disconnect", () => {
     console.log("User disconnected", socket.id);
-    // Remove disconnected users
+
     Object.keys(users).forEach((key) => {
       if (users[key] === socket.id) delete users[key];
     });
   });
 });
 
-// Start the Server
+
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

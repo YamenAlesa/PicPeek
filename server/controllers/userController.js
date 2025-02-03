@@ -211,18 +211,23 @@ const unfollowUser = async (req, res) => {
 };
 
 const getFriends = async (req, res) => {
-  const { userId } = req.user;
-
   try {
-    const user = await User.findById(userId).populate("followers following");
+    const user = await User.findById(req.user.id);
 
-    const friends = user.followers.filter((follower) =>
-      user.following.includes(follower._id.toString())
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const friends = user.following.filter((id) => user.followers.includes(id));
+
+    const friendDetails = await User.find({ _id: { $in: friends } }).select(
+      "id name profilePicture"
     );
 
-    res.status(200).json({ friends });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.json(friendDetails);
+  } catch (err) {
+    console.error("Error fetching friends:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 

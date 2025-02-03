@@ -5,6 +5,7 @@ import RegisterPage from "./RegisterPage";
 import SearchPage from "./searchPage";
 import UserDetailPage from "./userDetailPage";
 import Chat from "./chatPage";
+import FriendsChatList from "./friendsChatList";
 
 export const routes = [
   {
@@ -41,5 +42,10 @@ export const routes = [
     name: "Chat",
     element: <Chat />,
     path: "/chat",
+  },
+  {
+    name: "FriendsChatList",
+    element: <FriendsChatList />,
+    path: "/messages",
   },
 ];
