@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { followUser, unfollowUser } from "../requests/axios.requests";
 import { useSelector, useDispatch } from "react-redux";
@@ -7,10 +7,10 @@ import { followUserRedux, unfollowUserRedux } from "../reducers/userReducer";
 
 const UserDetailPage = () => {
   const { username } = useParams();
+  const navigate = useNavigate();
   const [targetUser, setTargetUser] = useState(null);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
-
   const user = useSelector((state) => state.user.user);
 
   const isFollowing = user && targetUser ? user.following.includes(targetUser.id) : false;
@@ -83,6 +83,7 @@ const UserDetailPage = () => {
         <p>Followers: {targetUser.followers}</p>
         <p>Following: {targetUser.following}</p>
       </div>
+
       <button
         onClick={handleFollowUser}
         className={`px-4 py-2 mt-4 text-white rounded-md ${
@@ -90,6 +91,13 @@ const UserDetailPage = () => {
         }`}
       >
         {isFollowing ? "Unfollow" : "Follow"}
+      </button>
+
+      <button
+        onClick={() => navigate(`/chat?userId=${targetUser.id}`)} 
+        className="px-4 py-2 mt-4 ml-2 text-white bg-green-500 rounded-md"
+      >
+        Message
       </button>
     </div>
   );

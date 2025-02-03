@@ -8,49 +8,89 @@ const bodyParser = require("body-parser");
 const userRoutes = require("./routes/userRoutes");
 const postRoutes = require("./routes/postRoutes");
 const authRoutes = require("./routes/authRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 const cloudinaryRoutes = require("./routes/cloudinaryRoutes");
 const morgan = require("morgan");
+const http = require("http");
+const { Server } = require("socket.io");
 
 dotenv.config();
 
-// Cors
-app.use;
-app.use(cors());
+// Create HTTP Server
+const server = http.createServer(app);
+
+// Setup WebSocket Server
+const io = new Server(server, {
+  cors: { origin: "http://localhost:3000", credentials: true },
+});
+
+// Middleware
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-const corsOptions = {
-  origin: "http://localhost:3000", 
-  credentials: true, 
-};
+// Database Connection
+mongoose
+  .connect(process.env.MONGOURI, {})
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((error) => console.error("MongoDB Connection Error:", error));
 
-app.use(cors(corsOptions));
-
-// Database
-mongoose.connect(process.env.MONGOURI, {});
-const db = mongoose.connection;
-db.on("error", (error) => console.error(error));
-db.once("open", () => console.log("Connected"));
-
-// API endpoint
+// API Endpoint
 app.get("/api", (req, res) => {
   res.json({ message: "Hello from the server!" });
 });
 
-// routes
 
+
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
-app.use("/api/cloudinary", cloudinaryRoutes)
+app.use("/api/cloudinary", cloudinaryRoutes);
+app.use("/api/chat", chatRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
 
 app.use((err, req, res, next) => {
-  console.error(err.stack); // Log error stack
+  console.error(err.stack);
   res.status(500).send("Something went wrong!");
+});
+
+
+
+let users = {};
+
+io.on("connection", (socket) => {
+  console.log("User connected", socket.id);
+
+  socket.on("join", (userId) => {
+    users[userId] = socket.id; 
+  });
+
+  socket.on("sendMessage", async ({ sender, receiver, message }) => {
+    try {
+      if (users[receiver]) {
+        io.to(users[receiver]).emit("receiveMessage", { sender, message });
+      }
+
+
+      await API.post("/chat/send", { sender, receiver, message }); 
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected", socket.id);
+
+    Object.keys(users).forEach((key) => {
+      if (users[key] === socket.id) delete users[key];
+    });
+  });
+});
+
+
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

@@ -2,8 +2,10 @@ import HomePage from "./homePage";
 import LoginPage from "./loginPage";
 import ProfilePage from "./profilePage";
 import RegisterPage from "./RegisterPage";
-import SearchPage from "./searchPage"; 
-import UserDetailPage from "./userDetailPage"; 
+import SearchPage from "./searchPage";
+import UserDetailPage from "./userDetailPage";
+import Chat from "./chatPage";
+import FriendsChatList from "./friendsChatList";
 
 export const routes = [
   {
@@ -27,13 +29,23 @@ export const routes = [
     path: "/user/profile",
   },
   {
-    name: "SearchPage", 
+    name: "SearchPage",
     element: <SearchPage />,
     path: "/search",
   },
   {
-    name: "UserDetailPage", 
+    name: "UserDetailPage",
     element: <UserDetailPage />,
-    path: "/user/profile/:username", 
+    path: "/user/profile/:username",
+  },
+  {
+    name: "Chat",
+    element: <Chat />,
+    path: "/chat",
+  },
+  {
+    name: "FriendsChatList",
+    element: <FriendsChatList />,
+    path: "/messages",
   },
 ];
