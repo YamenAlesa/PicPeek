@@ -5,6 +5,8 @@ import { login } from "../reducers/userReducer";
 import { FaCheckCircle } from "react-icons/fa";
 import { FaCircleXmark } from "react-icons/fa6";
 import { TbPhotoEdit } from "react-icons/tb";
+import ReactCrop from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 
 let debounceTimeout;
 
@@ -21,6 +23,9 @@ const UserProfile = () => {
   const [bioError, setBioError] = useState("");
   const [checkingUsername, setCheckingUsername] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [crop, setCrop] = useState({ unit: "%", width: 50, aspect: 1 });
+  const [imageRef, setImageRef] = useState(null);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -116,17 +121,62 @@ const UserProfile = () => {
     setBioError("");
   };
 
-  const handleFileChange = async (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setSelectedImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onImageLoaded = (image) => {
+    setImageRef(image);
+  };
+
+  const getCroppedImage = async () => {
+    if (!imageRef || !crop.width || !crop.height) return;
+    const canvas = document.createElement("canvas");
+    const scaleX = imageRef.naturalWidth / imageRef.width;
+    const scaleY = imageRef.naturalHeight / imageRef.height;
+    canvas.width = crop.width * scaleX;
+    canvas.height = crop.height * scaleY;
+    const ctx = canvas.getContext("2d");
+
+    ctx.drawImage(
+      imageRef,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width * scaleX,
+      crop.height * scaleY
+    );
+
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        const file = new File([blob], "cropped-image.jpg", { type: "image/jpeg" });
+        resolve(file);
+      }, "image/jpeg");
+    });
+  };
+
+  const handleCropConfirm = async () => {
+    const croppedFile = await getCroppedImage();
+    if (croppedFile) {
       const formData = new FormData();
-      formData.append("profilePicture", file);
+      formData.append("profilePicture", croppedFile);
       try {
         const response = await axios.post("http://localhost:4499/api/cloudinary/upload", formData, {
           headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
         });
         setProfilePicture(response.data.user.profilePicture);
         dispatch(login(response.data.user));
+        setSelectedImage(null);
       } catch (error) {
         console.error("Error uploading profile picture", error);
       }
@@ -278,6 +328,32 @@ const UserProfile = () => {
                 }`}
               >
                 Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Crop Modal */}
+      {selectedImage && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-6 rounded-md shadow-lg">
+            <h2 className="text-lg font-semibold mb-4">Crop Image</h2>
+            <ReactCrop crop={crop} onChange={setCrop} aspect={1}>
+              <img src={selectedImage} alt="Crop" onLoad={(e) => onImageLoaded(e.target)} />
+            </ReactCrop>
+            <div className="flex justify-end mt-4">
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded-md mr-2"
+                onClick={() => setSelectedImage(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                onClick={handleCropConfirm}
+              >
+                Crop & Upload
               </button>
             </div>
           </div>
